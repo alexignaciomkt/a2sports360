@@ -1,0 +1,144 @@
+SFD-001 - Jornada do Organizador
+
+System Flow Document
+
+Versão: 1.0
+
+Status: Em Desenvolvimento
+
+Objetivo
+
+Descrever toda a jornada do organizador, desde o primeiro acesso ao sistema até o encerramento do campeonato.
+
+Este documento servirá como base para:
+
+Desenvolvimento das telas.
+Desenvolvimento das APIs.
+Fluxos de navegação.
+Modelagem do banco de dados.
+Experiência do usuário (UX).
+Princípios
+
+Durante toda a jornada, o organizador deverá executar o menor número possível de ações.
+
+O sistema deverá automatizar tudo o que não exigir decisão humana.
+
+O organizador deverá atuar apenas como gestor da competição, intervindo somente quando necessário.
+
+ETAPA 1 — Acesso ao Sistema
+Cenário
+
+O organizador acessa a plataforma utilizando seu login.
+
+Após autenticação, será direcionado ao Dashboard Geral.
+
+Dashboard Geral
+
+O Dashboard deve apresentar uma visão consolidada da operação do organizador.
+
+Informações exibidas
+Campeonatos ativos
+Campeonatos encerrados
+Próximos eventos
+Total de atletas cadastrados
+Total de equipes cadastradas
+Total de campeonatos realizados
+KPIs gerais (definiremos posteriormente)
+Menu Principal
+
+O menu deverá conter, no mínimo:
+
+Dashboard
+Campeonatos
+Equipes
+Jogadores
+Eventos (A2Tickets360)
+Rankings (Roadmap)
+Estatísticas (Roadmap)
+Configurações
+ETAPA 2 — Seleção do Campeonato
+
+Ao acessar o módulo Campeonatos, o organizador visualizará todos os campeonatos vinculados à sua conta.
+
+Cada campeonato exibirá:
+
+Nome
+Data
+Modalidade
+Status
+Quantidade de equipes
+Situação atual
+Ações disponíveis
+
+Dependendo do estado do campeonato:
+
+Rascunho
+Editar
+Excluir
+Abrir inscrições
+Inscrições abertas
+Visualizar inscritos
+Encerrar inscrições
+Inscrições encerradas
+Conferir participantes
+Iniciar sorteio
+Em andamento
+Abrir Painel Operacional
+Finalizado
+Visualizar relatório
+Exportar resultados
+Duplicar campeonato (Roadmap)
+ETAPA 3 — Painel Operacional
+
+Este será o coração da plataforma.
+
+Ao clicar em "Abrir Painel Operacional", o organizador entra em uma interface dedicada exclusivamente ao campeonato.
+
+O painel deverá exibir:
+
+Cabeçalho
+Nome do campeonato
+Status
+Rodada atual
+Horário
+Indicadores rápidos
+Equipes restantes
+Partidas em andamento
+Mesas livres
+Partidas finalizadas
+Repescagens pendentes
+WO pendentes
+Botões principais
+Realizar Sorteio
+Gerar Próxima Rodada
+Abrir Telão
+Imprimir Confrontos
+Imprimir Identificação das Mesas
+Encerrar Campeonato
+ETAPA 4 — Operação do Campeonato
+
+Após iniciar o campeonato, o organizador deverá acompanhar a competição em tempo real.
+
+O sistema deverá atualizar automaticamente:
+
+Partidas iniciadas
+Partidas finalizadas
+Placar das partidas
+Avanço das equipes
+Ocorrências de WO
+Solicitações de repescagem
+
+O organizador deverá intervir apenas em situações excepcionais.
+
+ETAPA 5 — Encerramento
+
+Ao término da competição, o sistema deverá apresentar:
+
+Campeão
+Vice-campeão
+Terceiro colocado (quando aplicável)
+Estatísticas do campeonato
+Tempo total do evento
+Número de partidas realizadas
+
+Após confirmação do organizador, o campeonato será marcado como Finalizado.
