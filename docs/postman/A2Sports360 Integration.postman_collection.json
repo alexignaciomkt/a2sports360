@@ -1,0 +1,121 @@
+{
+	"info": {
+		"_postman_id": "a2sports360-integration-collection",
+		"name": "A2Sports360 Integration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Championship",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-A2-API-KEY",
+						"value": "{{a2_internal_api_key}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"source_system\": \"A2TICKETS\",\n  \"external_event_id\": \"{{external_event_id}}\",\n  \"tenant_external_id\": \"{{tenant_external_id}}\",\n  \"organizer_external_id\": \"org_123\",\n  \"organizer_name\": \"Org Name\",\n  \"championship_name\": \"Postman Test Championship\",\n  \"modality\": \"truco_duplas\",\n  \"format\": \"one_table_demo\",\n  \"target_score\": 12\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/internal/tickets/create-championship",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"internal",
+						"tickets",
+						"create-championship"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Team",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-A2-API-KEY",
+						"value": "{{a2_internal_api_key}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"external_order_id\": \"ord_123\",\n  \"team_name\": \"Time Teste\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/internal/tickets/register-team",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"internal",
+						"tickets",
+						"register-team"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "a2_internal_api_key",
+			"value": "your_test_key_here",
+			"type": "string"
+		},
+		{
+			"key": "tenant_external_id",
+			"value": "your_tenant_id",
+			"type": "string"
+		},
+		{
+			"key": "external_event_id",
+			"value": "evt_test",
+			"type": "string"
+		}
+	]
+}
