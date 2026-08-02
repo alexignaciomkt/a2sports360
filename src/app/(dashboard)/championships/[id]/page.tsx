@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server"
 import { ChampionshipService } from "@/domains/championship/championship.service"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, Users, Monitor, MonitorPlay, Activity } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
+import { ChampionshipJourney } from "./components/championship-journey"
 
 export default async function ChampionshipDetailsPage({
   params,
@@ -12,14 +13,48 @@ export default async function ChampionshipDetailsPage({
 }) {
   const { id } = await params
   
-  let championship
+  let championship;
+  let teamsCount = 0;
+  let tableStatus: string | null = null;
+  let currentMatch = null;
+
   try {
     const { tenantId } = await requireTenant()
     const supabase = await createClient()
     const service = new ChampionshipService(supabase)
     
     championship = await service.getChampionshipDetails(id, tenantId)
-  } catch {
+    
+    // Buscar quantidade de duplas
+    const { count: countTeams } = await supabase
+      .from('teams')
+      .select('id', { count: 'exact', head: true })
+      .eq('championship_id', id);
+    teamsCount = countTeams || 0;
+
+    // Buscar Mesa 1
+    const { data: tableData } = await supabase
+      .from('game_tables')
+      .select('*')
+      .eq('championship_id', id)
+      .eq('number', 1)
+      .single();
+    
+    if (tableData) {
+      tableStatus = tableData.status;
+      
+      if (tableData.current_match_id) {
+        const { data: matchData } = await supabase
+          .from('matches')
+          .select('*')
+          .eq('id', tableData.current_match_id)
+          .single();
+        currentMatch = matchData;
+      }
+    }
+
+  } catch (error) {
+    console.error(error);
     notFound()
   }
 
@@ -77,64 +112,12 @@ export default async function ChampionshipDetailsPage({
         )}
       </div>
 
-      <div className="mt-12">
-        <h2 className="text-lg font-semibold text-white">Gerenciamento</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          
-          <div className="group relative rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 opacity-60 transition-opacity hover:opacity-100">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500/10">
-              <Users className="h-5 w-5 text-indigo-400" />
-            </div>
-            <h3 className="mt-4 font-semibold text-white">Equipes e Jogadores</h3>
-            <p className="mt-1 text-sm text-zinc-400">Gerencie as inscrições do torneio.</p>
-            <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-zinc-950/80 opacity-100 backdrop-blur-sm transition-opacity group-hover:opacity-100">
-              <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs font-medium text-white">
-                Disponível na Próxima Fatia
-              </span>
-            </div>
-          </div>
-
-          <div className="group relative rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 opacity-60 transition-opacity hover:opacity-100">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
-              <MonitorPlay className="h-5 w-5 text-emerald-400" />
-            </div>
-            <h3 className="mt-4 font-semibold text-white">Mesa 1</h3>
-            <p className="mt-1 text-sm text-zinc-400">Acesse o painel do árbitro (QR Code).</p>
-            <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-zinc-950/80 opacity-100 backdrop-blur-sm transition-opacity group-hover:opacity-100">
-              <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs font-medium text-white">
-                Disponível na Próxima Fatia
-              </span>
-            </div>
-          </div>
-
-          <div className="group relative rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 opacity-60 transition-opacity hover:opacity-100">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
-              <Activity className="h-5 w-5 text-amber-400" />
-            </div>
-            <h3 className="mt-4 font-semibold text-white">Partidas</h3>
-            <p className="mt-1 text-sm text-zinc-400">Acompanhe as chaves e andamento.</p>
-            <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-zinc-950/80 opacity-100 backdrop-blur-sm transition-opacity group-hover:opacity-100">
-              <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs font-medium text-white">
-                Disponível na Próxima Fatia
-              </span>
-            </div>
-          </div>
-
-          <div className="group relative rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 opacity-60 transition-opacity hover:opacity-100">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-500/10">
-              <Monitor className="h-5 w-5 text-rose-400" />
-            </div>
-            <h3 className="mt-4 font-semibold text-white">Telão (Public)</h3>
-            <p className="mt-1 text-sm text-zinc-400">Abra o placar em tempo real.</p>
-            <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-zinc-950/80 opacity-100 backdrop-blur-sm transition-opacity group-hover:opacity-100">
-              <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs font-medium text-white">
-                Disponível na Próxima Fatia
-              </span>
-            </div>
-          </div>
-
-        </div>
-      </div>
+      <ChampionshipJourney 
+        championshipId={championship.id}
+        teamsCount={teamsCount}
+        tableStatus={tableStatus}
+        currentMatch={currentMatch}
+      />
     </div>
   )
 }

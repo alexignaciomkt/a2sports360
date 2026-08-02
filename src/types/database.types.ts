@@ -493,16 +493,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      register_match_event: {
-        Args: {
-          p_device_id: string
-          p_event_type: string
-          p_match_id: string
-          p_metadata: Json
-          p_points_delta: number
-          p_session_token_hash: string
-          p_team_id: string
-        }
+      register_match_event:
+        | {
+            Args: {
+              p_device_id: string
+              p_event_type: string
+              p_match_id: string
+              p_metadata: Json
+              p_points_delta: number
+              p_session_token_hash: string
+              p_team_id: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_device_id: string
+              p_event_type: string
+              p_match_id: string
+              p_metadata: Json
+              p_points_delta: number
+              p_session_token_hash: string
+              p_team_id: string
+            }
+            Returns: Json
+          }
+      undo_match_event: {
+        Args: { p_match_id: string; p_session_token_hash: string }
         Returns: Json
       }
     }
