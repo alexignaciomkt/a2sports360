@@ -1,6 +1,7 @@
 import { requireTenant } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
 import { ChampionshipService } from "@/domains/championship/championship.service"
+import { ResourceService } from "@/domains/resource/resource.service"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
@@ -15,8 +16,10 @@ export default async function ChampionshipDetailsPage({
   
   let championship;
   let teamsCount = 0;
-  let tableStatus: string | null = null;
   let currentMatch = null;
+  let settings = null;
+  let hasPlaces = false;
+  let firstResourceNumber: number | undefined;
 
   try {
     const { tenantId } = await requireTenant()
@@ -25,29 +28,33 @@ export default async function ChampionshipDetailsPage({
     
     championship = await service.getChampionshipDetails(id, tenantId)
     
-    // Buscar quantidade de duplas
+    const { data: settingsData } = await supabase
+      .from('championship_settings')
+      .select('target_score')
+      .eq('championship_id', id)
+      .single();
+    settings = settingsData;
+    
     const { count: countTeams } = await supabase
       .from('teams')
       .select('id', { count: 'exact', head: true })
       .eq('championship_id', id);
     teamsCount = countTeams || 0;
 
-    // Buscar Mesa 1
-    const { data: tableData } = await supabase
-      .from('game_tables')
-      .select('*')
-      .eq('championship_id', id)
-      .eq('number', 1)
-      .single();
-    
-    if (tableData) {
-      tableStatus = tableData.status;
-      
-      if (tableData.current_match_id) {
+    // Usar ResourceService em vez de acesso direto a game_tables (Repository Rule)
+    const resourceService = new ResourceService(supabase)
+    const resources = await resourceService.getResourcesByChampionship(id, tenantId)
+    hasPlaces = resources.length > 0;
+
+    if (resources.length > 0) {
+      const firstResource = resources[0]
+      firstResourceNumber = firstResource.number
+
+      if (firstResource.activeGameId) {
         const { data: matchData } = await supabase
           .from('matches')
           .select('*')
-          .eq('id', tableData.current_match_id)
+          .eq('id', firstResource.activeGameId)
           .single();
         currentMatch = matchData;
       }
@@ -115,8 +122,10 @@ export default async function ChampionshipDetailsPage({
       <ChampionshipJourney 
         championshipId={championship.id}
         teamsCount={teamsCount}
-        tableStatus={tableStatus}
         currentMatch={currentMatch}
+        settings={settings || { target_score: 12 }}
+        hasPlaces={hasPlaces}
+        firstResourceNumber={firstResourceNumber}
       />
     </div>
   )

@@ -1,26 +1,79 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colors */
+  --background: #0c0e0f;
+  --surface: #121415;
+  --surface-elevated: #1a1c1d;
+  --surface-high: #282a2b;
+  
+  --foreground: #ffffff;
+  --foreground-muted: #c0caad;
+  
+  --primary: #9ffb00;
+  --primary-hover: #8bdc00;
+  --primary-foreground: #102000;
+  
+  --border: #414a34;
+  --border-light: #8a947a;
+  
+  --success: #10b981;
+  --success-foreground: #064e3b;
+  
+  --warning: #f59e0b;
+  --warning-foreground: #78350f;
+  
+  --danger: #ffb4ab;
+  --danger-foreground: #690005;
+  --danger-muted: #93000a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-foreground-muted: var(--foreground-muted);
+  
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-high: var(--surface-high);
+  
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-muted: var(--danger-muted);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-hanken);
+  --font-mono: var(--font-jetbrains);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  overscroll-behavior: none;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Util class for subtle glow */
+.neon-glow {
+  box-shadow: 0 0 15px rgba(159, 251, 0, 0.2);
+}
+.neon-glow-strong {
+  box-shadow: 0 0 25px rgba(159, 251, 0, 0.4);
 }

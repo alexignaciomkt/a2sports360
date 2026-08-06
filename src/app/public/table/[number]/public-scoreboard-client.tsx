@@ -11,9 +11,10 @@ interface MatchProps {
   teamA: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   teamB: any;
+  tableName: string;
 }
 
-export function PublicScoreboardClient({ match: initialMatch, teamA, teamB }: MatchProps) {
+export function PublicScoreboardClient({ match: initialMatch, teamA, teamB, tableName }: MatchProps) {
   const [match, setMatch] = useState(initialMatch)
   
   const isFinished = match?.status === 'finished'
@@ -44,7 +45,7 @@ export function PublicScoreboardClient({ match: initialMatch, teamA, teamB }: Ma
     return (
       <div className="flex flex-col items-center justify-center min-h-screen text-center p-12 bg-black">
         <h1 className="text-3xl font-bold text-white">Aguardando Início da Partida</h1>
-        <p className="mt-4 text-xl text-zinc-400">O organizador ainda não iniciou o confronto nesta mesa.</p>
+        <p className="mt-4 text-xl text-zinc-400">O organizador ainda não iniciou o confronto neste local ({tableName}).</p>
       </div>
     )
   }

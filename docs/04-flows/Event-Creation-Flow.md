@@ -1,0 +1,2 @@
+# Fluxo de Criação de Evento
+A2Tickets (Compra) -> Webhook -> A2Sports -> Recebe e cria Tenants/Championships -> Organization cadastra times -> Tournament Engine cria Encounters -> Operation Engine despacha na Mesa.

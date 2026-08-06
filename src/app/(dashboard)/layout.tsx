@@ -1,7 +1,10 @@
+import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import Link from "next/link"
-import { LogOut } from "lucide-react"
 import { requireTenant } from "@/lib/auth"
+import { AppSidebar } from "@/components/ui/app-sidebar"
+import { AppTopbar } from "@/components/ui/app-topbar"
+import { AppButton } from "@/components/ui/app-button"
+import { SidebarProvider } from "@/components/ui/sidebar-provider"
 
 export default async function DashboardLayout({
   children,
@@ -17,22 +20,22 @@ export default async function DashboardLayout({
     }
     // Profile or tenant missing
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 p-4">
-        <div className="w-full max-w-md rounded-xl border border-red-900/50 bg-red-950/20 p-6 text-center">
-          <h2 className="text-xl font-bold text-red-500">Acesso Negado</h2>
-          <p className="mt-2 text-zinc-300">{err instanceof Error ? err.message : "Acesso não autorizado."}</p>
+      <div className="flex min-h-screen flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md rounded-xl border border-danger-muted/50 bg-danger-muted/10 p-6 text-center">
+          <h2 className="text-xl font-bold text-danger">Acesso Negado</h2>
+          <p className="mt-2 text-foreground-muted">{err instanceof Error ? err.message : "Acesso não autorizado."}</p>
           <form action="/login" className="mt-6">
-            <button
+            <AppButton
+              variant="outline"
               type="submit"
               formAction={async () => {
                 "use server"
                 const { logout } = await import("@/actions/auth.actions")
                 await logout()
               }}
-              className="rounded-md bg-zinc-800 px-4 py-2 text-sm text-white hover:bg-zinc-700"
             >
               Sair e tentar com outra conta
-            </button>
+            </AppButton>
           </form>
         </div>
       </div>
@@ -41,54 +44,27 @@ export default async function DashboardLayout({
 
   const { tenantName } = tenantData
 
-  return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <nav className="border-b border-zinc-800 bg-zinc-900">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-8">
-              <Link href="/dashboard" className="text-xl font-bold text-indigo-400">
-                A2Sports360
-              </Link>
-              <div className="flex gap-4">
-                <Link
-                  href="/dashboard"
-                  className="rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-800 hover:text-white"
-                >
-                  Visão Geral
-                </Link>
-                <Link
-                  href="/championships"
-                  className="rounded-md px-3 py-2 text-sm font-medium hover:bg-zinc-800 hover:text-white"
-                >
-                  Campeonatos
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-zinc-400">{tenantName}</span>
-              <form>
-                <button
-                  type="submit"
-                  title="Sair"
-                  formAction={async () => {
-                    "use server"
-                    const { logout } = await import("@/actions/auth.actions")
-                    await logout()
-                  }}
-                  className="rounded-full p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white"
-                >
-                  <LogOut className="h-5 w-5" />
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </nav>
+  const handleLogout = async () => {
+    "use server"
+    const { logout } = await import("@/actions/auth.actions")
+    await logout()
+  }
 
-      <main className="mx-auto max-w-5xl p-4 sm:p-6 lg:p-8">
-        {children}
-      </main>
-    </div>
+  const cookieStore = await cookies()
+  const defaultCollapsed = cookieStore.get("sidebar:collapsed")?.value === "true"
+
+  return (
+    <SidebarProvider defaultCollapsed={defaultCollapsed}>
+      <AppSidebar tenantName={tenantName} />
+      
+      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 w-full relative">
+        <AppTopbar logoutAction={handleLogout} />
+        
+        <main className="flex-1 pt-8 pb-8 px-4 md:px-8 w-full max-w-7xl mx-auto">
+          {children}
+        </main>
+      </div>
+    </SidebarProvider>
   )
 }
+

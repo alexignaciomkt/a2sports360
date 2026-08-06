@@ -3,87 +3,87 @@
 import { requireTenant } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { OperationService } from "@/domains/operation/operation.service"
 
 export async function generateMatch(championshipId: string) {
   try {
     const { tenantId } = await requireTenant()
     const supabase = await createClient()
 
-    // 1. Verify access
-    const { data: champ, error: champError } = await supabase
-      .from('championships')
-      .select('id')
-      .eq('id', championshipId)
-      .eq('tenant_id', tenantId)
-      .single()
+    // Tournament Command: gerar chaveamento
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: rpcData, error: rpcError } = await (supabase.rpc as any)('generate_direct_match_tournament', {
+      p_championship_id: championshipId,
+      p_tenant_id: tenantId
+    })
 
-    if (champError || !champ) throw new Error("Acesso negado.")
+    if (rpcError) throw rpcError
 
-    // 2. Load the 2 teams
-    const { data: teams } = await supabase
-      .from('teams')
-      .select('id')
-      .eq('championship_id', championshipId)
-      .order('created_at', { ascending: true })
-      
-    if (!teams || teams.length !== 2) throw new Error("É necessário exatamente duas duplas.")
-
-    // 3. Load Table 1
-    const { data: table } = await supabase
-      .from('game_tables')
-      .select('id, current_match_id')
-      .eq('championship_id', championshipId)
-      .eq('number', 1)
-      .single()
-
-    if (!table) throw new Error("A Mesa 1 não foi configurada.")
-
-    // 4. Idempotency Check: if there's already an active match, just return success
-    if (table.current_match_id) {
-      return { success: true }
+    // Gatilho: Operation Engine processa a fila após Tournament Command.
+    // Se falhar, o chaveamento já está confirmado. Retry é idempotente.
+    let queueResult = null
+    try {
+      const engine = new OperationService(supabase)
+      queueResult = await engine.processQueue(tenantId, championshipId)
+    } catch (queueError) {
+      console.error('[Operation Engine] Falha ao processar fila após Tournament:', queueError)
     }
-
-    // Also check if any match exists for this championship (one table MVP only has 1 match)
-    const { data: existingMatch } = await supabase
-      .from('matches')
-      .select('id')
-      .eq('championship_id', championshipId)
-      .single()
-
-    let matchId = existingMatch?.id
-
-    if (!matchId) {
-      // Create new match
-      const { data: newMatch, error: matchError } = await supabase
-        .from('matches')
-        .insert({
-          championship_id: championshipId,
-          table_id: table.id,
-          team_a_id: teams[0].id,
-          team_b_id: teams[1].id,
-          team_a_score: 0,
-          team_b_score: 0,
-          status: 'scheduled'
-        })
-        .select()
-        .single()
-        
-      if (matchError) throw matchError
-      matchId = newMatch.id
-    }
-
-    // Link match to table
-    await supabase
-      .from('game_tables')
-      .update({ current_match_id: matchId, status: 'occupied' })
-      .eq('id', table.id)
 
     revalidatePath(`/championships/${championshipId}`)
     revalidatePath(`/championships/${championshipId}/match`)
 
-    return { success: true }
+    return { success: true, data: rpcData, queueResult }
   } catch (error: unknown) {
     console.error(error)
     return { success: false, error: error instanceof Error ? error.message : "Erro ao gerar confronto." }
+  }
+}
+
+export async function dispatchMatch(championshipId: string, encounterId: string, tableId: string) {
+  try {
+    const { tenantId } = await requireTenant()
+    const supabase = await createClient()
+    const engine = new OperationService(supabase)
+    
+    await engine.dispatchEncounter(tenantId, championshipId, encounterId, tableId)
+
+    revalidatePath(`/championships/${championshipId}/match`)
+    return { success: true }
+  } catch (error: unknown) {
+    console.error(error)
+    return { success: false, error: error instanceof Error ? error.message : "Erro ao despachar partida." }
+  }
+}
+
+export async function resolveMatch(championshipId: string, encounterId: string, matchId: string) {
+  try {
+    const { tenantId } = await requireTenant()
+    const supabase = await createClient()
+    const { ResolutionService } = await import("@/domains/resolution/resolution.service")
+    const resolutionEngine = new ResolutionService(supabase)
+    
+    const result = await resolutionEngine.resolveFinishedGame(tenantId, championshipId, encounterId, matchId)
+
+    // Gatilho: Operation Engine processa a fila após Resolution Command.
+    // Se falhar, a resolução já está confirmada. Retry é idempotente.
+    let queueResult = null
+    if (result.outcome === 'encounter_finished') {
+      try {
+        const operationEngine = new OperationService(supabase)
+        queueResult = await operationEngine.processQueue(tenantId, championshipId)
+      } catch (queueError) {
+        console.error('[Operation Engine] Falha ao processar fila após Resolution:', queueError)
+      }
+    }
+
+    revalidatePath(`/championships/${championshipId}`)
+    revalidatePath(`/championships/${championshipId}/match`)
+    // Nota: revalidação do display público e do controle operacional
+    // será feita quando as rotas forem parametrizadas por resourceId.
+    
+    return { success: true, outcome: result.outcome, queueResult }
+  } catch (error: unknown) {
+    console.error(error)
+    return { success: false, error: error instanceof Error ? error.message : "Erro ao homologar a partida." }
   }
 }

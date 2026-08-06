@@ -1,0 +1,333 @@
+<html lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<style>
+        @layer base {
+            html, body {
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                overscroll-behavior: none;
+            }
+            main > :first-child {
+                margin-top: 0 !important;
+            }
+            main > :last-child {
+                margin-bottom: 0 !important;
+            }
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#414a34",
+                        "primary-fixed-dim": "#8bdc00",
+                        "on-surface": "#e2e2e3",
+                        "on-secondary-container": "#b4b5b5",
+                        "surface-container-low": "#1a1c1d",
+                        "secondary": "#c6c6c7",
+                        "on-secondary-fixed-variant": "#454747",
+                        "on-surface-variant": "#c0caad",
+                        "background": "#121415",
+                        "surface-bright": "#38393a",
+                        "on-primary": "#1f3700",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "on-secondary": "#2f3131",
+                        "on-tertiary-fixed-variant": "#444748",
+                        "tertiary-fixed": "#e1e3e4",
+                        "secondary-container": "#454747",
+                        "inverse-surface": "#e2e2e3",
+                        "surface": "#121415",
+                        "surface-dim": "#121415",
+                        "primary": "#ffffff",
+                        "inverse-primary": "#406900",
+                        "secondary-fixed": "#e2e2e2",
+                        "inverse-on-surface": "#2f3132",
+                        "surface-container-highest": "#333536",
+                        "primary-container": "#9ffb00",
+                        "error": "#ffb4ab",
+                        "tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "surface-container-high": "#282a2b",
+                        "outline": "#8a947a",
+                        "error-container": "#93000a",
+                        "surface-tint": "#8bdc00",
+                        "on-primary-fixed-variant": "#2f4f00",
+                        "surface-variant": "#333536",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "on-primary-container": "#457000",
+                        "primary-fixed": "#9ffb00",
+                        "on-tertiary-container": "#626566",
+                        "surface-container": "#1e2021",
+                        "on-tertiary-fixed": "#191c1d",
+                        "surface-container-lowest": "#0c0e0f",
+                        "on-tertiary": "#2e3132",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "on-background": "#e2e2e3",
+                        "tertiary-container": "#e1e3e4",
+                        "on-primary-fixed": "#102000"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "base": "8px",
+                        "stack-sm": "4px",
+                        "stack-md": "12px",
+                        "stack-lg": "24px",
+                        "container-padding-mobile": "16px",
+                        "container-padding-desktop": "32px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-sm": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+</head>
+<body class="bg-surface font-body-md text-on-surface">
+<aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-lowest z-50 flex flex-col border-r border-outline-variant/30 shadow-xl">
+<div class="p-8 flex items-center gap-3">
+<img alt="A2 Sports 360 Logo" class="h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLt8XqvWQTtUYxqZ0Mph3jDj9ypU9cYrRQ9_gc9LOjSLdZrfr2DhnqNNz6FGnhH-uLMz31jMzv_ASnAzlujlK5hwuYBMXQ8W9BDkYBP2boX7nZoXP9WfIGfPbL0ZU0LukIsu0-fkyKDuffiCY6MFGGN8Kr6Ymz27NoC_hMIQ9qyUrb7v8YkwshmtDDfez4R6avLNwtz-z5_ilSo8GiTHKs1JuqqJMQ9NoBS1D8rKtMCq7srURFMux66A86lb"/>
+<span class="font-headline-md text-headline-md text-primary-fixed uppercase tracking-tighter">A2 Sports 360</span>
+</div>
+<nav class="flex-1 px-4 space-y-base">
+<a class="flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" data-path="dashboard" href="#">
+<span class="material-symbols-outlined mr-4 group-hover:text-primary-fixed">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a aria-current="page" class="flex items-center px-4 py-3 rounded-lg transition-all group bg-primary-container text-on-primary-container font-bold shadow-[0_0_15px_rgba(159,251,0,0.2)]" data-path="campeonatos" href="#">
+<span class="material-symbols-outlined mr-4 group-hover:text-primary-fixed">trophy</span>
+<span class="font-label-md text-label-md">Campeonatos</span>
+</a>
+<a class="flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" data-path="equipes" href="#">
+<span class="material-symbols-outlined mr-4 group-hover:text-primary-fixed">groups</span>
+<span class="font-label-md text-label-md">Equipes</span>
+</a>
+<a class="flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" data-path="chaves" href="#">
+<span class="material-symbols-outlined mr-4 group-hover:text-primary-fixed">account_tree</span>
+<span class="font-label-md text-label-md">Chaves</span>
+</a>
+<div class="pt-4 mt-4 border-t border-outline-variant/20">
+<a class="flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" data-path="configuracoes" href="#">
+<span class="material-symbols-outlined mr-4 group-hover:text-primary-fixed">settings</span>
+<span class="font-label-md text-label-md">Configurações</span>
+</a>
+</div>
+</nav>
+<div class="p-6 mx-4 mb-4 rounded-xl bg-surface-container flex items-center gap-3 border border-outline-variant/10">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-black/40">
+<span class="material-symbols-outlined text-on-primary text-[20px]">person</span>
+</div>
+<div class="overflow-hidden">
+<p class="font-label-md text-label-md text-on-surface truncate">Admin User</p>
+<p class="text-[10px] text-on-surface-variant font-label-sm uppercase tracking-widest">Pro Access</p>
+</div>
+</div>
+</aside>
+<div class="pl-72 flex flex-col h-screen">
+<header class="h-16 bg-surface/80 backdrop-blur-xl z-40 px-container-padding-desktop flex items-center justify-between border-b border-outline-variant/10 shrink-0">
+<div class="flex items-center gap-4 bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant/20 w-96">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-on-surface-variant/50" placeholder="Pesquisar atletas ou partidas..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-on-surface-variant hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary-container rounded-full ring-2 ring-surface"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</header>
+<main class="flex-1 flex flex-col relative overflow-hidden bg-surface">
+<!-- Header Section -->
+<div class="px-container-padding-desktop py-6 flex items-end justify-between shrink-0">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-primary-fixed uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+<span class="w-2 h-2 bg-primary-container rounded-full animate-pulse"></span>
+                        Partida em Andamento
+                    </span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface uppercase tracking-tighter">Mesa #042</h1>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-label-md text-label-md text-on-surface-variant mb-1">Duração</span>
+<span class="font-label-md text-label-md text-on-surface bg-surface-container px-3 py-1 rounded-full border border-outline-variant/30" id="game-timer">00:14:52</span>
+</div>
+</div>
+<!-- Vertical Split Scoreboard Area -->
+<div class="flex-1 grid grid-cols-2 h-full overflow-hidden">
+<!-- Team 'Nós' Left Half -->
+<div class="relative flex flex-col items-center justify-center border-r border-outline-variant/10 bg-surface">
+<div class="flex flex-col items-center mb-12">
+<span class="font-label-md text-label-md text-primary-fixed uppercase tracking-[0.3em] mb-6">Nós</span>
+<div class="font-display-lg text-[220px] leading-none text-primary font-black tracking-tighter tabular-nums drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]" id="score-nos">00</div>
+<div class="flex gap-2 mt-8">
+<div class="w-2 h-8 bg-primary-fixed/20 rounded-full"></div>
+<div class="w-2 h-8 bg-primary-fixed/20 rounded-full"></div>
+<div class="w-2 h-8 bg-primary-fixed/20 rounded-full"></div>
+</div>
+</div>
+<!-- Team Nós Action -->
+<button class="w-72 h-32 bg-primary-container rounded-2xl flex flex-col items-center justify-center active:scale-[0.98] transition-all shadow-2xl shadow-primary-container/20 group relative overflow-hidden" onclick="updateScore('nos', 1)">
+<div class="absolute top-4 right-4 bg-on-primary-container/20 w-10 h-10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container">add</span>
+</div>
+<span class="font-headline-lg text-on-primary-container uppercase tracking-tight">Ponto</span>
+<span class="font-label-sm text-label-sm text-on-primary-container/70 mt-1">EQUIPE NÓS</span>
+</button>
+</div>
+<!-- Team 'Eles' Right Half -->
+<div class="relative flex flex-col items-center justify-center bg-surface-container-lowest/30">
+<div class="flex flex-col items-center mb-12">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-[0.3em] mb-6">Eles</span>
+<div class="font-display-lg text-[220px] leading-none text-on-surface font-black tracking-tighter tabular-nums opacity-60" id="score-eles">04</div>
+<div class="flex gap-2 mt-8">
+<div class="w-2 h-8 bg-primary-fixed rounded-full"></div>
+<div class="w-2 h-8 bg-primary-fixed rounded-full"></div>
+<div class="w-2 h-8 bg-primary-fixed rounded-full"></div>
+</div>
+</div>
+<!-- Team Eles Action -->
+<button class="w-72 h-32 bg-surface-container-highest border border-outline-variant/30 rounded-2xl flex flex-col items-center justify-center active:scale-[0.98] transition-all shadow-xl group relative overflow-hidden" onclick="updateScore('eles', 1)">
+<div class="absolute top-4 right-4 bg-on-surface-variant/20 w-10 h-10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">add</span>
+</div>
+<span class="font-headline-lg text-on-surface uppercase tracking-tight">Ponto</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">EQUIPE ELES</span>
+</button>
+</div>
+</div>
+<!-- Persistent Bottom Action Bar -->
+<div class="bg-surface-container-low border-t border-outline-variant/20 p-4 shrink-0">
+<div class="grid grid-cols-3 gap-4 max-w-4xl mx-auto h-16">
+<button class="bg-error-container rounded-xl flex items-center justify-center gap-3 active:bg-error/20 transition-colors">
+<span class="material-symbols-outlined text-on-error-container">undo</span>
+<span class="font-label-md text-label-md text-on-error-container uppercase">Voltar</span>
+</button>
+<button class="bg-surface-bright border-2 border-primary-fixed rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(159,251,0,0.15)] active:scale-[0.95] transition-all" onclick="triggerTruco()">
+<span class="font-headline-md text-primary-fixed uppercase tracking-tighter italic">TRUCO!</span>
+</button>
+<button class="bg-surface-container-high rounded-xl flex items-center justify-center gap-3 active:bg-surface-container-highest transition-colors border border-outline-variant/10" onclick="openTableId()">
+<span class="material-symbols-outlined text-on-surface-variant">qr_code_2</span>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase">Mesa</span>
+</button>
+</div>
+</div>
+<!-- Table Identification Modal -->
+<div class="fixed inset-0 z-50 bg-surface/95 backdrop-blur-md hidden items-center justify-center p-8" id="modal-qr">
+<div class="w-full max-w-sm flex flex-col items-center text-center">
+<div class="bg-white p-6 rounded-3xl mb-8 shadow-2xl shadow-primary-fixed/20">
+<div class="w-64 h-64 bg-surface flex items-center justify-center overflow-hidden">
+<img alt="QR Code" class="w-full h-full object-contain mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzxz58tFgWWPG4sKR-cZI9gtWBBt_COqV4oABcQeNXjVGNQcQvWG01vaWzI7e-MimvGxBlrZxheHKKaSp0ElIjSBQXeu4EM2fhxEq2leRKkOr0YHEYFNx4AcJ9NUTa0xEvvbymsmRKwxyK8PCBAif59ID7DUW6O2IhMzziDfvZ4CzwkRBvHbkSX1is9OUMFpvZ4C13sVrPmICJkbNVQFcQhF1eVxEAVk3xqMsy2RCgdrmO6pzos5VOoQ"/>
+</div>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Identificação de Mesa</h2>
+<p class="font-body-md text-on-surface-variant mb-8">Escaneie para vincular atletas ou registrar lances oficiais nesta partida.</p>
+<button class="w-full py-4 bg-primary-fixed text-on-primary-fixed font-bold rounded-full uppercase tracking-widest shadow-xl shadow-primary-fixed/20" onclick="closeTableId()">Fechar</button>
+</div>
+</div>
+</main>
+</div>
+<script>
+        let scores = { nos: 0, eles: 4 };
+        const MAX_SCORE = 12;
+
+        function updateScore(team, val) {
+            scores[team] += val;
+            if(scores[team] > MAX_SCORE) scores[team] = 0;
+            
+            const el = document.getElementById(`score-${team}`);
+            el.innerText = scores[team].toString().padStart(2, '0');
+            
+            // Haptic Feedback Simulation
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(50);
+            }
+
+            // Visual feedback
+            el.classList.add('scale-110', 'text-primary-fixed');
+            setTimeout(() => el.classList.remove('scale-110', 'text-primary-fixed'), 200);
+        }
+
+        function triggerTruco() {
+            const body = document.body;
+            body.classList.add('animate-pulse-bg');
+            setTimeout(() => body.classList.remove('animate-pulse-bg'), 1000);
+            
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate([100, 50, 100]);
+            }
+        }
+
+        function openTableId() {
+            const modal = document.getElementById('modal-qr');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeTableId() {
+            const modal = document.getElementById('modal-qr');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Simple timer logic
+        let seconds = 892; // 14:52
+        setInterval(() => {
+            seconds++;
+            const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            document.getElementById('game-timer').innerText = `${h}:${m}:${s}`;
+        }, 1000);
+    </script>
+<style>
+        @keyframes pulse-custom {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(159, 251, 0, 0.05); }
+            100% { background-color: transparent; }
+        }
+        .animate-pulse-bg {
+            animation: pulse-custom 0.5s ease-in-out infinite;
+        }
+        #score-nos, #score-eles {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
+        }
+    </style>
+</body></html>

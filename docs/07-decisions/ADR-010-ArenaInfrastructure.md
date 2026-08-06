@@ -1,0 +1,6 @@
+# ADR-010: Arena Infrastructure V2
+**Contexto**: A plataforma precisava ser expandida para múltiplos esportes (Quadras, Campos, Mesas), abandonando a ideia de que existe apenas uma "Mesa 1".
+**Decisão 1**: Manutenção temporária do nome `game_tables` para evitar quebra de integrações legadas e QR Codes em andamento. O mapeamento no TypeScript trata tudo como `Resource` e `Arena`.
+**Decisão 2**: A Identidade de "mesmo conjunto" na configuração em lote é feita pelo par `resource_type` + `prefix_group`.
+**Decisão 3**: Separação conceitual entre o Tournament Engine (gera os Encounters) e o Dispatch Engine (colocará as pessoas nas Arenas). Arenas não bloqueiam as inscrições.
+**Decisão 4**: Geração de `qr_token` na inicialização do lote utilizará apenas a função nativa `REPLACE(gen_random_uuid()::text, '-', '')` em vez de `gen_random_bytes(16)`. O motivo é evitar o vazamento de dependências para o PostgreSQL do Supabase (que precisaria habilitar a extensão `pgcrypto` para expor funções raw bytes com cast pra string), e se manter fiel ao nível de entropia da antiga geração TypeScript `randomBytes(16).toString('hex')` (que era alfanumérica de 32 chars).

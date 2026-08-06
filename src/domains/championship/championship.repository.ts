@@ -40,7 +40,7 @@ export class ChampionshipRepository {
   async findByIdAndTenant(id: string, tenantId: string) {
     const { data: championship, error } = await this.supabase
       .from("championships")
-      .select("*")
+      .select("*, championship_settings(*)")
       .eq("id", id)
       .eq("tenant_id", tenantId)
       .single()

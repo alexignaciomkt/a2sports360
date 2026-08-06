@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { PublicScoreboardClient } from "./public-scoreboard-client"
+import { ResourceService } from "@/domains/resource/resource.service"
 import { notFound } from "next/navigation"
 
 export default async function PublicTablePage({
@@ -17,12 +18,8 @@ export default async function PublicTablePage({
   const supabase = await createClient()
 
   // Find table
-  const { data: table } = await supabase
-    .from('game_tables')
-    .select('*')
-    .eq('championship_id', championship)
-    .eq('number', parseInt(number))
-    .single()
+  const resourceService = new ResourceService(supabase)
+  const table = await resourceService.getResourceByNumber(championship, parseInt(number))
 
   if (!table) notFound()
 
@@ -33,11 +30,11 @@ export default async function PublicTablePage({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let teamB: any = null;
 
-  if (table.current_match_id) {
+  if (table.activeGameId) {
     const { data: matchData } = await supabase
       .from('matches')
       .select('*')
-      .eq('id', table.current_match_id)
+      .eq('id', table.activeGameId)
       .single()
       
     match = matchData
@@ -58,7 +55,8 @@ export default async function PublicTablePage({
       <PublicScoreboardClient 
         match={match} 
         teamA={teamA} 
-        teamB={teamB} 
+        teamB={teamB}
+        tableName={table.displayName}
       />
     </main>
   )
