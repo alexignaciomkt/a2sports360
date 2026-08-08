@@ -18,6 +18,9 @@ const payloadSchema = z.object({
   tenant_external_id: z.string().min(1),
   organizer_external_id: z.string().min(1),
   organizer_name: z.string().min(1),
+  organizer_email: z.string().email(),
+  organizer_phone: z.string().optional().nullable(),
+  organizer_document: z.string().optional().nullable(),
   championship_name: z.string().min(1),
   modality: z.literal('truco_duplas'),
   format: z.string().min(1),
@@ -118,23 +121,84 @@ export async function POST(request: NextRequest) {
       .select('tenant_id')
       .eq('source_system', payload.source_system)
       .eq('external_tenant_id', payload.tenant_external_id)
-      .single();
-
-    if (mappingError || !mappingData) {
-      logData.status_code = 404;
-      logData.error_code = 'TENANT_MAPPING_NOT_FOUND';
+      .maybeSingle();
+ 
+    if (mappingError) {
+      logData.status_code = 500;
+      logData.error_code = 'TENANT_MAPPING_LOOKUP_FAILED';
       logData.duration_ms = Date.now() - startTime;
       console.log(JSON.stringify(logData));
       
       return NextResponse.json({
         success: false,
-        code: 'TENANT_MAPPING_NOT_FOUND',
-        message: 'O organizador ainda não está vinculado à A2Sports360.',
+        code: 'INTERNAL_ERROR',
+        message: 'Erro ao consultar mapeamento de tenant.',
         request_id: requestId
-      }, { status: 404 });
+      }, { status: 500 });
     }
-
-    const tenantId = mappingData.tenant_id;
+ 
+    let tenantId: string;
+ 
+    if (mappingData) {
+      tenantId = mappingData.tenant_id;
+    } else {
+      // Auto-provision Tenant
+      const { data: newTenant, error: tenantError } = await adminClient
+        .from('tenants')
+        .insert({
+          name: payload.organizer_name
+        })
+        .select('id')
+        .single();
+ 
+      if (tenantError || !newTenant) {
+        logData.status_code = 500;
+        logData.error_code = 'TENANT_CREATION_FAILED';
+        logData.duration_ms = Date.now() - startTime;
+        console.log(JSON.stringify(logData));
+        
+        return NextResponse.json({
+          success: false,
+          code: 'INTERNAL_ERROR',
+          message: 'Falha ao criar tenant automaticamente.',
+          request_id: requestId
+        }, { status: 500 });
+      }
+ 
+      tenantId = newTenant.id;
+ 
+      // Auto-provision Tenant Mapping
+      const { error: mappingInsertError } = await adminClient
+        .from('tenant_mappings')
+        .insert({
+          tenant_id: tenantId,
+          source_system: payload.source_system,
+          external_tenant_id: payload.tenant_external_id,
+          metadata: {
+            created_by_integration: true,
+            organizer_email: payload.organizer_email,
+            organizer_phone: payload.organizer_phone,
+            organizer_document: payload.organizer_document,
+            organizer_name: payload.organizer_name,
+            external_organizer_id: payload.organizer_external_id
+          }
+        });
+ 
+      if (mappingInsertError) {
+        logData.status_code = 500;
+        logData.error_code = 'TENANT_MAPPING_CREATION_FAILED';
+        logData.duration_ms = Date.now() - startTime;
+        console.log(JSON.stringify(logData));
+        
+        return NextResponse.json({
+          success: false,
+          code: 'INTERNAL_ERROR',
+          message: 'Falha ao mapear tenant automaticamente.',
+          request_id: requestId
+        }, { status: 500 });
+      }
+    }
+ 
     logData.tenant_id = tenantId;
 
     // 4. Combine metadata
