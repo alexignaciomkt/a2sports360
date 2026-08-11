@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -784,6 +784,16 @@ export type Database = {
           p_player2_phone: string
           p_team_name: string
           p_tenant_id: string
+        }
+        Returns: Json
+      }
+      register_external_team_with_players: {
+        Args: {
+          p_championship_id: string
+          p_team_name: string
+          p_source_system: string
+          p_external_team_id: string
+          p_players: Json
         }
         Returns: Json
       }
