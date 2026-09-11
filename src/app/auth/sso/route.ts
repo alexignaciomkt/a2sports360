@@ -1,40 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { jwtVerify } from 'jose';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const ticket = searchParams.get('ticket');
+  const token = searchParams.get('token');
 
-  if (!ticket) {
-    return NextResponse.redirect(new URL('/login?error=missing_ticket', request.url));
+  if (!token) {
+    return NextResponse.redirect(new URL('/login?error=missing_token', request.url));
   }
 
   try {
-    // 1. Consume ticket from Tickets Backend
-    const ticketsBackendUrl = process.env.A2TICKETS_BACKEND_URL || 'http://127.0.0.1:3002';
-    const consumeResponse = await fetch(`${ticketsBackendUrl}/api/integrations/sports/consume-login-ticket`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-A2-API-KEY': process.env.A2_INTERNAL_API_KEY || ''
-      },
-      body: JSON.stringify({ ticket })
-    });
+    // 1. Verify SSO JWT Stateless
+    const ssoSecret = process.env.A2SPORTS_SSO_SECRET;
+    if (!ssoSecret) {
+      console.error('[SSO] SSO_SECRET_MISSING configuration missing.');
+      return NextResponse.redirect(new URL('/login?error=sso_internal_error', request.url));
+    }
 
-    if (!consumeResponse.ok) {
-      const errData = await consumeResponse.json().catch(() => ({}));
-      console.error('[SSO] Ticket consumption failed:', errData);
-      return NextResponse.redirect(new URL('/login?error=invalid_ticket', request.url));
+    const secret = new TextEncoder().encode(ssoSecret);
+    let jwtPayload;
+    
+    try {
+      const { payload } = await jwtVerify(token, secret, {
+        issuer: 'A2TICKETS',
+        audience: 'A2SPORTS',
+      });
+      jwtPayload = payload;
+    } catch (err: any) {
+      console.error('[SSO] JWT validation failed:', err.message);
+      return NextResponse.redirect(new URL('/login?error=invalid_token', request.url));
     }
 
     const {
-      tickets_user_id,
-      organizer_id,
-      organizer_email,
-      sports_championship_id,
-      external_tenant_id
-    } = await consumeResponse.json();
+      email: organizer_email,
+      tenant_external_id: external_tenant_id,
+      championship_id: sports_championship_id
+    } = jwtPayload as any;
+
+    const tickets_user_id = jwtPayload.sub;
+
+    if (!organizer_email || !external_tenant_id || !sports_championship_id) {
+      console.error('[SSO] JWT missing required claims.');
+      return NextResponse.redirect(new URL('/login?error=invalid_token', request.url));
+    }
 
     // 2. Resolve Tenant local mapping
     const { data: mappingData, error: mappingError } = await adminClient
@@ -60,8 +70,7 @@ export async function GET(request: NextRequest) {
       email_confirm: true,
       user_metadata: {
         source_system: 'A2TICKETS',
-        external_user_id: tickets_user_id,
-        external_organizer_id: organizer_id
+        external_user_id: tickets_user_id
       }
     });
 
@@ -168,3 +177,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL(`/login?error=sso_internal_error`, request.url));
   }
 }
+
